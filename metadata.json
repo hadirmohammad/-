@@ -1,0 +1,8 @@
+{
+  "name": "Remix مُتقِن - متابعة حفظ وتكرار القرآن الكريم",
+  "description": "تطبيق متكامل لمتابعة حفظ ومراجعة سور القرآن الكريم وعدد التكرارات بنظام الخانات التفاعلية ونسب الإنجاز",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

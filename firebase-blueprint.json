@@ -1,0 +1,195 @@
+{
+  "entities": {
+    "userProfile": {
+      "title": "UserProfile",
+      "description": "User profile and sync metadata",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Owner user ID matching auth UID"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "User display name"
+        },
+        "email": {
+          "type": "string",
+          "description": "User email address"
+        },
+        "syncCode": {
+          "type": "string",
+          "description": "Optional short sync code for multi-device linking"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "ISO date string of last update"
+        }
+      },
+      "required": ["userId", "updatedAt"]
+    },
+    "dailyPlan": {
+      "title": "DailyPlan",
+      "description": "Quran daily plan and multi-track progression",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Owner user ID matching auth UID"
+        },
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether daily plan is enabled"
+        },
+        "autoAdvanceOnNewDay": {
+          "type": "boolean",
+          "description": "Whether auto progression on new day is enabled"
+        },
+        "autoAdvanceCondition": {
+          "type": "string",
+          "description": "Condition for auto advance ('always' or 'only_if_completed')"
+        },
+        "newMemorize": {
+          "type": "object",
+          "description": "New memorization track configuration and state"
+        },
+        "nearRevision": {
+          "type": "object",
+          "description": "Near revision track configuration and state"
+        },
+        "distantRevision": {
+          "type": "object",
+          "description": "Distant revision track configuration and state"
+        },
+        "lastDateActive": {
+          "type": "string",
+          "description": "Last active calendar date (YYYY-MM-DD)"
+        },
+        "completedDaysStreak": {
+          "type": "number",
+          "description": "Streak of completed days"
+        },
+        "history": {
+          "type": "array",
+          "description": "List of recent history records"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "ISO timestamp string"
+        }
+      },
+      "required": ["userId", "newMemorize", "nearRevision", "distantRevision", "lastDateActive"]
+    },
+    "surahProgress": {
+      "title": "SurahProgress",
+      "description": "Progress and repetition record for an individual Surah",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Owner user ID matching auth UID"
+        },
+        "surahId": {
+          "type": "number",
+          "description": "Surah number from 1 to 114"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["not_started", "in_progress", "memorized", "mastered"],
+          "description": "Memorization status"
+        },
+        "targetRepetitions": {
+          "type": "number",
+          "description": "Target repetitions for memorization"
+        },
+        "completedRepetitions": {
+          "type": "number",
+          "description": "Completed repetitions for memorization"
+        },
+        "revisionTargetRepetitions": {
+          "type": "number",
+          "description": "Target repetitions for revision"
+        },
+        "revisionCompletedRepetitions": {
+          "type": "number",
+          "description": "Completed repetitions for revision"
+        },
+        "lastActivityDate": {
+          "type": "string",
+          "description": "Last date of activity"
+        },
+        "memorizedDate": {
+          "type": "string",
+          "description": "Date marked as memorized"
+        },
+        "notes": {
+          "type": "string",
+          "description": "User notes for this Surah"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "ISO timestamp string"
+        }
+      },
+      "required": ["userId", "surahId", "status", "targetRepetitions", "completedRepetitions"]
+    },
+    "userSettings": {
+      "title": "UserSettings",
+      "description": "Preferences and app settings for the user",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Owner user ID"
+        },
+        "dailyRepetitionGoal": {
+          "type": "number",
+          "description": "Daily repetition goal count"
+        },
+        "defaultMemorizeTarget": {
+          "type": "number",
+          "description": "Default repetitions target for new memorization"
+        },
+        "defaultRevisionTarget": {
+          "type": "number",
+          "description": "Default repetitions target for revision"
+        },
+        "soundEnabled": {
+          "type": "boolean",
+          "description": "Whether sound effects are enabled"
+        },
+        "celebrationEnabled": {
+          "type": "boolean",
+          "description": "Whether confetti celebration is enabled"
+        },
+        "activeMethod": {
+          "type": "string",
+          "description": "Active repetition methodology"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "ISO timestamp string"
+        }
+      },
+      "required": ["userId", "dailyRepetitionGoal"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "userProfile",
+      "description": "User profile document"
+    },
+    "/users/{userId}/plan/current": {
+      "schema": "dailyPlan",
+      "description": "User daily Quran plan and progress"
+    },
+    "/users/{userId}/progress/{surahId}": {
+      "schema": "surahProgress",
+      "description": "Per-surah memorization state"
+    },
+    "/users/{userId}/settings/current": {
+      "schema": "userSettings",
+      "description": "User settings document"
+    }
+  }
+}

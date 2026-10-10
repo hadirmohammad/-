@@ -1,0 +1,64 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default-deny all by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    // User profile document
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidId(userId) && incoming().userId == userId;
+      allow update: if isOwner(userId) && incoming().userId == userId;
+      allow delete: if isOwner(userId);
+
+      // User's plan document
+      match /plan/{planDocId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(planDocId) && incoming().userId == userId;
+        allow update: if isOwner(userId) && incoming().userId == userId;
+        allow delete: if isOwner(userId);
+      }
+
+      // User's surah progress documents
+      match /progress/{surahId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(surahId) && incoming().userId == userId;
+        allow update: if isOwner(userId) && incoming().userId == userId;
+        allow delete: if isOwner(userId);
+      }
+
+      // User's settings
+      match /settings/{settingDocId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(settingDocId) && incoming().userId == userId;
+        allow update: if isOwner(userId) && incoming().userId == userId;
+        allow delete: if isOwner(userId);
+      }
+    }
+
+    // Temporary cross-device sync codes (e.g. Q12345)
+    match /syncCodes/{code} {
+      allow read: if true;
+      allow create: if isSignedIn() && incoming().userId == request.auth.uid;
+      allow update, delete: if isSignedIn() && existing().userId == request.auth.uid;
+    }
+  }
+}
